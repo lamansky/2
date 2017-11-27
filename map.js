@@ -20,10 +20,10 @@ module.exports = function (thingToConvert, {fallback = new Map(), mirror = false
   }
 
   if (Array.isArray(thingToConvert)) {
-    if (mirror) {
-      return new Map(thingToConvert.map(item => [item, item]))
-    } else if (thingToConvert.every(item => Array.isArray(item) && item.length === 2)) {
+    if (thingToConvert.every(item => Array.isArray(item) && item.length === 2)) {
       return new Map(thingToConvert)
+    } else if (mirror) {
+      return new Map(thingToConvert.map(item => [item, item]))
     } else {
       return new Map(thingToConvert.map((item, index) => [index, item]))
     }
