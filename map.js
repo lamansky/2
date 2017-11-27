@@ -7,6 +7,10 @@
  * @param  {Map|null} [options.fallback=new Map()]
  *   The Map to return if `thingToConvert` cannot be turned into a Map.
  *   Set to null to throw an error instead.
+ * @param  {bool} [options.detectPairs=true]
+ *   This option only applies if `thingToConvert` is an array.
+ *   If set to `true`, an array of two-element arrays (the kind that’s used
+ *   to construct a Map) will be treated as an array of key-value entries.
  * @param  {bool} [options.mirror=false]
  *   This option only applies if `thingToConvert` is an array.
  *   If set to `true`, array values are used as both keys and values
@@ -14,13 +18,13 @@
  *   If `false`, array indices (0 to n-1) are used as the Map keys.
  * @return {Map}
  */
-module.exports = function (thingToConvert, {fallback = new Map(), mirror = false} = {}) {
+module.exports = function (thingToConvert, {fallback = new Map(), detectPairs = true, mirror = false} = {}) {
   if (thingToConvert instanceof Map) {
     return thingToConvert
   }
 
   if (Array.isArray(thingToConvert)) {
-    if (thingToConvert.every(item => Array.isArray(item) && item.length === 2)) {
+    if (detectPairs && thingToConvert.every(item => Array.isArray(item) && item.length === 2)) {
       return new Map(thingToConvert)
     } else if (mirror) {
       return new Map(thingToConvert.map(item => [item, item]))
