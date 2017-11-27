@@ -14,6 +14,8 @@ const toString = require('./string')
  *   If set to `true`, array values are used as both keys and values
  *   (i.e. the keys and values mirror each other).
  *   If `false`, array indices (0 to n-1) are used as the object keys.
+ *   If some array values have types which are among those supported as
+ *   object keys (strings, numbers, and symbols), then mirroring will not happen.
  * @return {object}
  */
 module.exports = function (thingToConvert, {fallback = {}, mirror = false} = {}) {
@@ -34,7 +36,7 @@ module.exports = function (thingToConvert, {fallback = {}, mirror = false} = {})
         object[key] = value
       }
       return object
-    } else if (mirror && thingToConvert.every(value => typeof value === 'string')) {
+    } else if (mirror && thingToConvert.every(value => ['string', 'number', 'symbol'].includes(typeof value))) {
       const object = {}
       for (const value of thingToConvert) {
         object[value] = value

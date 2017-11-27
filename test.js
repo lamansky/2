@@ -270,10 +270,11 @@ describe('2', function () {
       assert.strictEqual(object[200], '200')
     })
 
-    it('should only `mirror` values to keys if all values are strings', function () {
-      const object = toObject(['100', 200], {mirror: true})
+    it('should only `mirror` values to keys if all values can be object keys', function () {
+      const nonKeyable = {}
+      const object = toObject(['100', nonKeyable], {mirror: true})
       assert.strictEqual(object[0], '100')
-      assert.strictEqual(object[1], 200)
+      assert.strictEqual(object[1], nonKeyable)
     })
 
     it('should convert Map to object', function () {
