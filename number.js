@@ -16,7 +16,7 @@
  * @return {number}
  */
 module.exports = function (thingToConvert, {fallback = 0, finite = true, round = false} = {}) {
-  let number = Number(thingToConvert)
+  let number = thingToConvert === null ? NaN : Number(thingToConvert)
   if (Number.isFinite(number) || (!finite && !Number.isNaN(number))) {
     if (round) number = Math.round(number)
     return number
