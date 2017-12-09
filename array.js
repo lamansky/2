@@ -35,7 +35,7 @@ module.exports = function (thingToConvert, {detectIndexKeys = false} = {}) {
     if (detectIndexKeys && JSON.stringify(objectKeysArray) === JSON.stringify([...Array(Object.keys(thingToConvert).length).keys()].map(String))) {
       return objectKeysArray.map(key => thingToConvert[key])
     } else {
-      return Object.keys(thingToConvert).map(key => [key, thingToConvert[key]])
+      return Object.entries(thingToConvert)
     }
   }
 
