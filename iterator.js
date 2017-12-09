@@ -6,29 +6,14 @@
  * @return {object}
  */
 module.exports = function (thingToConvert) {
-  // Turn undefined/NaN into an empty iterator
+  // Turn undefined/null/NaN into an empty iterator
   if (typeof thingToConvert === 'undefined' || thingToConvert === null || Number.isNaN(thingToConvert)) {
-    return {
-      next () { return {done: true} },
-    }
+    return [][Symbol.iterator]()
   }
 
   // Turn a primitive into an iterator
   if (typeof thingToConvert !== 'object') {
-    let done = false
-    return {
-      next () {
-        if (done) {
-          return {done: true}
-        } else {
-          done = true
-          return {
-            value: thingToConvert,
-            done: false,
-          }
-        }
-      },
-    }
+    return [thingToConvert][Symbol.iterator]()
   }
 
   // Turn an Array, Set, Map, etc. into an iterator
@@ -37,22 +22,5 @@ module.exports = function (thingToConvert) {
   }
 
   // Turn an object into an iterator
-  let nextIndex = 0
-  const keys = Object.keys(thingToConvert)
-  const iterator = {
-    next () {
-      let key
-      if (nextIndex < keys.length) {
-        key = keys[nextIndex++]
-        return {
-          value: [key, thingToConvert[key]],
-          done: false,
-        }
-      } else {
-        return {done: true}
-      }
-    },
-  }
-  iterator[Symbol.iterator] = () => iterator
-  return iterator
+  return Object.entries(thingToConvert)[Symbol.iterator]()
 }
