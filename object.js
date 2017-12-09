@@ -23,9 +23,9 @@ module.exports = function (thingToConvert, {fallback = {}, mirror = false} = {})
     const object = {}
     for (const [key, value] of thingToConvert.entries()) {
       try {
-        object[toString(key, {fallback: null})] = value
+        object[typeof key === 'symbol' ? key : toString(key, {fallback: null})] = value
       } catch (x) {
-        throw new TypeError('Cannot convert map to object because map has keys which objects do not support. Objects can only have string/number keys.')
+        throw new TypeError('Cannot convert map to object because map has keys which objects do not support. Objects can only have string/number/symbol keys.')
       }
     }
     return object
