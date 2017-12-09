@@ -24,7 +24,7 @@ module.exports = function (thingToConvert, {fallback = ''} = {}) {
 
   if (typeof thingToConvert === 'object' && thingToConvert !== null &&
       thingToConvert.toString !== Object.prototype.toString) {
-    return thingToConvert + ''
+    return String(thingToConvert)
   }
 
   if (fallback instanceof String) {
