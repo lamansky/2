@@ -1,61 +1,23 @@
 'use strict'
 
-const toString = require('./string')
+const addCounter = require('add-counter')
+const every = require('@lamansky/every')
+const isArrayOfLength = require('is-array-of-length')
+const isInstanceOf = require('is-instance-of')
+const isIterable = require('is-iterable')
+const isObject = require('is-object')
+const map = require('map-iter')
+const newObject = require('new-object')
+const otherwise = require('otherwise')
+const sbo = require('sbo')
 
-/**
- * Converts a Map or array into an object.
- * @param  {any} thingToConvert
- * @param  {object} options
- * @param  {object|null} [options.fallback={}]
- *   The object to return if `thingToConvert` cannot be turned into an object.
- *   Set to `null` to throw an error instead.
- * @param  {bool} [options.mirror=false]
- *   This option only applies if `thingToConvert` is an array.
- *   If set to `true`, array values are used as both keys and values
- *   (i.e. the keys and values mirror each other).
- *   If `false`, array indices (0 to n-1) are used as the object keys.
- *   If some array values have types which are among those supported as
- *   object keys (strings, numbers, and symbols), then mirroring will not happen.
- * @return {object}
- */
-module.exports = function (thingToConvert, {fallback = {}, mirror = false} = {}) {
-  if (thingToConvert instanceof Map) {
-    const object = {}
-    for (const [key, value] of thingToConvert.entries()) {
-      try {
-        object[typeof key === 'symbol' ? key : toString(key, {fallback: null})] = value
-      } catch (x) {
-        throw new TypeError('Cannot convert map to object because map has keys which objects do not support. Objects can only have string/number/symbol keys.')
-      }
-    }
-    return object
-  } else if (Array.isArray(thingToConvert)) {
-    if (thingToConvert.every(entry => Array.isArray(entry) && entry.length === 2)) {
-      const object = {}
-      for (const [key, value] of thingToConvert) {
-        object[key] = value
-      }
-      return object
-    } else if (mirror && thingToConvert.every(value => ['string', 'number', 'symbol'].includes(typeof value))) {
-      const object = {}
-      for (const value of thingToConvert) {
-        object[value] = value
-      }
-      return object
-    } else {
-      const object = {}
-      for (let i = 0; i < thingToConvert.length; i++) {
-        object[i] = thingToConvert[i]
-      }
-      return object
-    }
-  } else if (typeof thingToConvert === 'object' && thingToConvert !== null) {
-    return thingToConvert
+module.exports = sbo(function toObject (x, {arrays = [], elseReturn = {}, elseThrow, maps = [], mirror = false} = {}) {
+  if (isInstanceOf(x, [Map, maps])) return newObject(x.entries(), {throwIfEquivKeys: true})
+  if (isIterable(x) && typeof x !== 'string') {
+    if (every(x, el => isArrayOfLength(el, 2))) return newObject(x)
+    if (mirror) return newObject(map(x, v => [v, v]), {throwIfEquivKeys: true})
+    return newObject(addCounter(x))
   }
-
-  if (typeof fallback !== 'object' || fallback === null) {
-    throw new TypeError('Failed to convert input of an unrecognized type into an object.')
-  }
-
-  return fallback
-}
+  if (isObject(x)) return x
+  return otherwise({elseReturn, elseThrow}, TypeError)
+})

@@ -28,6 +28,21 @@
   "engines": {
     "node": ">=7.0.0"
   },
+  "dependencies": {
+    "@lamansky/every": "^1.0.0",
+    "add-counter": "^1.0.0",
+    "empty-iterator": "^1.0.0",
+    "is-array-of-length": "^1.0.0",
+    "is-instance-of": "^1.0.1",
+    "is-iterable": "^1.1.1",
+    "is-nil": "^1.0.1",
+    "is-object": "^1.0.1",
+    "map-iter": "^1.0.0",
+    "new-object": "^3.1.0",
+    "otherwise": "^1.1.0",
+    "qfn": "^1.0.1",
+    "sbo": "^1.1.0"
+  },
   "devDependencies": {
     "eslint-config-lamansky": "^1.0.0",
     "mocha": "^5.2.0"

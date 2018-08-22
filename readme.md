@@ -5,24 +5,21 @@ A [Node.js](https://nodejs.org/) module for converting between various JavaScrip
 ```javascript
 const {toArray, toIterator, toMap, toNumber, toObject, toString} = require('2')
 
-let data = {a: 1, b: 2}
-data = toMap(data)
-data = toArray(data)
-data = toObject(data)
-data = toIterator(data)
-data = toArray(data)
-data = toMap(data)
-data = toObject(data) // {a: 1, b: 2}
+const obj = {a: 1, b: 2}
+obj::toMap()::toArray()::toObject()::toIterator()
+  ::toArray()::toMap()::toObject() // {a: 1, b: 2}
 
-data = '1.23'
+let data = '1.23'
 data = toNumber(data)
 data = toString(data) // '1.23'
 ```
 
 ## Installation
 
+Requires [Node.js](https://nodejs.org/) 7.0.0 or above.
+
 ```bash
-npm install 2 --save
+npm i 2
 ```
 
 ## Usage
@@ -113,11 +110,11 @@ toNumber(NaN) // 0
 toNumber('not a number') // 0
 
 // Can specify a fallback other than zero:
-toNumber('not a number', {fallback: 100}) // 100
+toNumber('not a number', {elseReturn: 100}) // 100
 
-// You can choose to throw an error for invalid inputs by
-// providing a null fallback:
-toNumber('not a number', {fallback: null}) // throws error
+// You can choose to throw an error for invalid inputs.
+toNumber('not a number', {elseThrow: true}) // throws error
+toNumber('not a number', {elseThrow: new TypeError('Not a number!')})
 
 // Option to round floats:
 toNumber('4.7') // 4.7
@@ -197,14 +194,25 @@ String(Symbol('test')) // 'Symbol(test)'
 
 // Default fallback is an empty string, but you can change it:
 toString(undefined) // ''
-toString(undefined, {fallback: 'N/A'}) // 'N/A'
+toString(undefined, {elseReturn: 'N/A'}) // 'N/A'
 
-// You can choose to throw an error for invalid inputs by
-// providing a null fallback:
-toString(undefined, {fallback: null}) // throws error
+// You can choose to throw an error for invalid inputs.
+toString(undefined, {elseThrow: true}) // throws error
 
 // String object => String
 let stringObject = new String('test')
 typeof stringObject // 'object'
 typeof toString(stringObject) // 'string'
 ```
+
+## Version Migration Guide
+
+Here are backward-incompatible changes you need to know about.
+
+### 1.x ⇒ 2.x
+
+* `fallback` has been renamed to `elseReturn`
+* Use `elseThrow: true` instead of `fallback: null`
+* Unlike the old `fallback` parameter, `elseReturn` does _not_ type-enforce its values.
+* `toObject` with `mirror: true` will now throw an error if any key would overwrite another key. In version 1, this would have been allowed.
+* `toObject` with `mirror: true` will now allow an object to become an object key, so long as its string representation is not equivalent to that of any other key. In version 1, attempting to use an object as an object key would silently fail and would result in numeric index keys being used instead.

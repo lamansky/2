@@ -1,47 +1,24 @@
 'use strict'
 
-/**
- * Converts an array or object into a Map.
- * @param  {any} thingToConvert
- * @param  {object} options
- * @param  {Map|null} [options.fallback=new Map()]
- *   The Map to return if `thingToConvert` cannot be turned into a Map.
- *   Set to null to throw an error instead.
- * @param  {bool} [options.detectPairs=true]
- *   This option only applies if `thingToConvert` is an array.
- *   If set to `true`, an array of two-element arrays (the kind that’s used
- *   to construct a Map) will be treated as an array of key-value entries.
- * @param  {bool} [options.mirror=false]
- *   This option only applies if `thingToConvert` is an array.
- *   If set to `true`, array values are used as both keys and values
- *   (i.e. the keys and values mirror each other).
- *   If `false`, array indices (0 to n-1) are used as the Map keys.
- * @return {Map}
- */
-module.exports = function (thingToConvert, {fallback = new Map(), detectPairs = true, mirror = false} = {}) {
-  if (thingToConvert instanceof Map) {
-    return thingToConvert
-  }
+const every = require('@lamansky/every')
+const isArrayOfLength = require('is-array-of-length')
+const isInstanceOf = require('is-instance-of')
+const isIterable = require('is-iterable')
+const isObject = require('is-object')
+const map = require('map-iter')
+const otherwise = require('otherwise')
+const sbo = require('sbo')
 
-  if (Array.isArray(thingToConvert)) {
-    if (detectPairs && thingToConvert.every(item => Array.isArray(item) && item.length === 2)) {
-      return new Map(thingToConvert)
-    } else if (mirror) {
-      return new Map(thingToConvert.map(item => [item, item]))
-    } else {
-      return new Map(thingToConvert.map((item, index) => [index, item]))
-    }
+module.exports = sbo(function toMap (x, {arrays = [], convertMaps = true, elseReturn = new Map(), elseThrow, detectPairs = true, maps = [], mirror = false} = {}) {
+  if (x instanceof Map) return x
+  if (isInstanceOf(x, maps)) return convertMaps ? new Map(x.entries()) : x
+  if (isIterable(x) && typeof x !== 'string') {
+    return new Map(
+      detectPairs && every(x, el => isArrayOfLength(el, 2)) ? x
+      : mirror ? map(x, el => [el, el])
+      : map(x, (el, i) => [i, el])
+    )
   }
-
-  if (typeof thingToConvert === 'object' && thingToConvert !== null) {
-    return new Map(Object.keys(thingToConvert).map(
-      key => [key, thingToConvert[key]]
-    ))
-  }
-
-  if (!(fallback instanceof Map)) {
-    throw new TypeError('Failed to convert input of an unrecognized type into a Map.')
-  }
-
-  return fallback
-}
+  if (isObject(x)) return new Map(Object.entries(x))
+  return otherwise({elseReturn, elseThrow}, TypeError)
+})

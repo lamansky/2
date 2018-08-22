@@ -174,13 +174,13 @@ describe('2', function () {
     })
 
     it('should return the provided fallback if input is unconvertible', function () {
-      const map = toMap('not a map', {fallback: new Map([['a', 1], ['b', 2]])})
+      const map = toMap('not a map', {elseReturn: new Map([['a', 1], ['b', 2]])})
       assert.strictEqual(map.get('a'), 1)
       assert.strictEqual(map.get('b'), 2)
     })
 
-    it('should throw error if input is unconvertible and fallback is not a Map', function () {
-      assert.throws(() => { toMap('not a map', {fallback: null}) }, TypeError)
+    it('should throw `elseThrow` if input is unconvertible', function () {
+      assert.throws(() => { toMap('not a map', {elseThrow: TypeError}) }, TypeError)
     })
   })
 
@@ -229,20 +229,16 @@ describe('2', function () {
       assert.strictEqual(toNumber('not a number'), 0)
     })
 
-    it('should return the provided fallback if number is invalid', function () {
-      assert.strictEqual(toNumber('not a number', {fallback: 2}), 2)
+    it('should return `elseReturn` if number is unconvertible', function () {
+      assert.strictEqual(toNumber('not a number', {elseReturn: 2}), 2)
     })
 
-    it('should round fallback if `round` is true', function () {
-      assert.strictEqual(toNumber({}, {fallback: 3.3, round: true}), 3)
+    it('should round `elseReturn` if `round` is true', function () {
+      assert.strictEqual(toNumber({}, {elseReturn: 3.3, round: true}), 3)
     })
 
-    it('should convert Number object fallback to primitive number', function () {
-      assert.strictEqual(typeof toNumber({}, {fallback: new Number(1)}), 'number') // eslint-disable-line no-new-wrappers
-    })
-
-    it('should throw error if number is invalid and fallback is not a number', function () {
-      assert.throws(() => { toNumber('not a number', {fallback: null}) }, TypeError)
+    it('should throw `elseThrow` if input is unconvertible', function () {
+      assert.throws(() => { toNumber('not a number', {elseThrow: new RangeError()}) }, RangeError)
     })
   })
 
@@ -270,11 +266,9 @@ describe('2', function () {
       assert.strictEqual(object[200], '200')
     })
 
-    it('should only `mirror` values to keys if all values can be object keys', function () {
-      const nonKeyable = {}
-      const object = toObject(['100', nonKeyable], {mirror: true})
-      assert.strictEqual(object[0], '100')
-      assert.strictEqual(object[1], nonKeyable)
+    it('should throw if mirrored values would be string-equivalent keys', function () {
+      toObject(['100', {}], {mirror: true})
+      assert.throws(() => { toObject(['100', {}, {}], {mirror: true}) })
     })
 
     it('should convert Map to object', function () {
@@ -287,12 +281,8 @@ describe('2', function () {
       assert.strictEqual(JSON.stringify(toObject('not an object')), JSON.stringify({}))
     })
 
-    it('should return the provided fallback if input is unconvertible', function () {
-      assert.strictEqual(JSON.stringify(toObject('not an object', {fallback: {a: 1}})), JSON.stringify({a: 1}))
-    })
-
-    it('should throw error if input is unconvertible and fallback is not object', function () {
-      assert.throws(() => { toObject('not an object', {fallback: null}) }, TypeError)
+    it('should return `elseReturn` if input is unconvertible', function () {
+      assert.strictEqual(JSON.stringify(toObject('not an object', {elseReturn: {a: 1}})), JSON.stringify({a: 1}))
     })
 
     it('should throw error if Map has keys that are not strings/numbers', function () {
@@ -371,16 +361,12 @@ describe('2', function () {
       assert.strictEqual(toString(object), 'string value')
     })
 
-    it('should return the provided fallback if input is unconvertible', function () {
-      assert.strictEqual(toString({}, {fallback: 'test'}), 'test')
+    it('should return `elseReturn` if input is unconvertible', function () {
+      assert.strictEqual(toString({}, {elseReturn: 'test'}), 'test')
     })
 
-    it('should convert String object fallback to primitive string', function () {
-      assert.strictEqual(typeof toString({}, {fallback: new String('test')}), 'string') // eslint-disable-line no-new-wrappers
-    })
-
-    it('should throw error if input is unconvertible and fallback is not string', function () {
-      assert.throws(() => { toString({}, {fallback: null}) }, TypeError)
+    it('should throw `elseThrow` if input is unconvertible', function () {
+      assert.throws(() => { toString({}, {elseThrow: true}) }, TypeError)
     })
   })
 

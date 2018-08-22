@@ -1,43 +1,25 @@
 'use strict'
 
-/**
- * Converts a map, iterable, object, or primitive into an array.
- * @param  {any} thingToConvert
- * @param  {object} options
- * @param  {bool} [options.detectIndexKeys=false] Whether or not map/object keys
- *   should be assumed to represent array indices if the keys go from 0...n-1
- * @return {array}
- */
-module.exports = function (thingToConvert, {detectIndexKeys = false} = {}) {
-  if (typeof thingToConvert === 'undefined' || thingToConvert === null || Number.isNaN(thingToConvert)) {
-    return []
-  }
+const isInstanceOf = require('is-instance-of')
+const isIterable = require('is-iterable')
+const isNil = require('is-nil')
+const isObject = require('is-object')
+const sbo = require('sbo')
 
-  if (Array.isArray(thingToConvert)) {
-    return thingToConvert
-  }
+module.exports = sbo(function toArray (x, {arrays = [], convertArrays, detectIndexKeys = false, maps = []} = {}) {
+  if (isNil(x) || Number.isNaN(x)) return []
+  if (Array.isArray(x) || (isInstanceOf(x, arrays) && !convertArrays)) return x
+  if (isInstanceOf(x, [Map, maps])) return Array.from(detectIndexKeys && keysLookLikeIndexes(x.keys()) ? x.values() : x)
+  if (isIterable(x) && typeof x !== 'string') return Array.from(x)
+  if (isObject(x)) return detectIndexKeys && keysLookLikeIndexes(Object.keys(x).sort()) ? Object.values(x) : Object.entries(x)
+  return [x]
+})
 
-  if (thingToConvert instanceof Map) {
-    if (detectIndexKeys && JSON.stringify([...thingToConvert.keys()].map(String)) === JSON.stringify([...Array(thingToConvert.size).keys()].map(String))) {
-      return Array.from(thingToConvert.values())
-    } else {
-      return Array.from(thingToConvert)
-    }
+function keysLookLikeIndexes (keys) {
+  let i = 0
+  for (const key of keys) {
+    if (key !== i && key !== String(i)) return false
+    i++
   }
-
-  if (typeof thingToConvert[Symbol.iterator] !== 'undefined' && typeof thingToConvert !== 'string') {
-    return Array.from(thingToConvert)
-  }
-
-  if (typeof thingToConvert === 'object' && thingToConvert !== null) {
-    const objectKeysArray = [...Object.keys(thingToConvert)]
-    objectKeysArray.sort() // JS does not guarantee object key order, so sort the keys.
-    if (detectIndexKeys && JSON.stringify(objectKeysArray) === JSON.stringify([...Array(Object.keys(thingToConvert).length).keys()].map(String))) {
-      return objectKeysArray.map(key => thingToConvert[key])
-    } else {
-      return Object.entries(thingToConvert)
-    }
-  }
-
-  return [thingToConvert]
+  return i > 0
 }
