@@ -205,6 +205,34 @@ describe('2', function () {
       assert.strictEqual(toNumber('1.2'), 1.2)
     })
 
+    it('should convert float string to number', function () {
+      assert.strictEqual(toNumber('1,2'), 1.2)
+    })
+
+    it('should convert float string to number', function () {
+      assert.strictEqual(toNumber('1,200'), 1200)
+    })
+
+    it('should convert float string to number', function () {
+      assert.strictEqual(toNumber('1.200'), 1200)
+    })
+
+    it('should convert float string to number', function () {
+      assert.strictEqual(toNumber('1.2001'), 1.2001)
+    })
+
+    it('should convert float string to number', function () {
+      assert.strictEqual(toNumber('1.200.100,123'), 1200100.123)
+    })
+
+    it('should convert float string to number', function () {
+      assert.strictEqual(toNumber('1 200 100,123'), 1200100.123)
+    })
+
+    it('should convert float string to number', function () {
+      assert.strictEqual(toNumber('1 200 100.123'), 1200100.123)
+    })
+
     it('should round float to integer if `round` is true', function () {
       assert.strictEqual(toNumber(4.7, {round: true}), 5)
     })
