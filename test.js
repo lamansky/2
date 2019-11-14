@@ -1,7 +1,7 @@
 'use strict'
 
 const assert = require('assert')
-const {toArray, toIterator, toMap, toNumber, toObject, toString} = require('.')
+const {toArray, toIterator, toMap, toNumber, toObject, toString: toStr} = require('.')
 
 describe('2', function () {
   describe('#toArray()', function () {
@@ -72,7 +72,7 @@ describe('2', function () {
       assert.strictEqual(typeof iterator, 'object')
       assert.strictEqual(typeof iterator.next, 'function')
       let r = iterator.next()
-      assert.notEqual(r.done, true)
+      assert.notStrictEqual(r.done, true)
       assert.strictEqual(r.value, 'test')
       r = iterator.next()
       assert.strictEqual(r.done, true)
@@ -89,10 +89,10 @@ describe('2', function () {
         assert.strictEqual(typeof iterator, 'object')
         assert.strictEqual(typeof iterator.next, 'function')
         let r = iterator.next()
-        assert.notEqual(r.done, true)
+        assert.notStrictEqual(r.done, true)
         assert.strictEqual(r.value, 1)
         r = iterator.next()
-        assert.notEqual(r.done, true)
+        assert.notStrictEqual(r.done, true)
         assert.strictEqual(r.value, 2)
         r = iterator.next()
         assert.strictEqual(r.done, true)
@@ -110,13 +110,13 @@ describe('2', function () {
         assert.strictEqual(typeof iterator, 'object')
         assert.strictEqual(typeof iterator.next, 'function')
         let r = iterator.next()
-        assert.notEqual(r.done, true)
+        assert.notStrictEqual(r.done, true)
         assert(Array.isArray(r.value))
         assert.strictEqual(r.value.length, 2)
         assert.strictEqual(r.value[0], 'a')
         assert.strictEqual(r.value[1], 1)
         r = iterator.next()
-        assert.notEqual(r.done, true)
+        assert.notStrictEqual(r.done, true)
         assert(Array.isArray(r.value))
         assert.strictEqual(r.value.length, 2)
         assert.strictEqual(r.value[0], 'b')
@@ -292,63 +292,63 @@ describe('2', function () {
 
   describe('#toString()', function () {
     it('should convert string to string', function () {
-      assert.strictEqual(toString('test'), 'test')
+      assert.strictEqual(toStr('test'), 'test')
     })
 
     it('should convert String object to string', function () {
-      assert.strictEqual(typeof toString(new String('test')), typeof 'test') // eslint-disable-line no-new-wrappers
+      assert.strictEqual(typeof toStr(new String('test')), typeof 'test') // eslint-disable-line no-new-wrappers
     })
 
     it('should convert number to string', function () {
-      assert.strictEqual(toString(-123), '-123')
+      assert.strictEqual(toStr(-123), '-123')
     })
 
     it('should convert 0 to "0"', function () {
-      assert.strictEqual(toString(0), '0')
+      assert.strictEqual(toStr(0), '0')
     })
 
     it('should convert -0 to "0"', function () {
-      assert.strictEqual(toString(-0), '0')
+      assert.strictEqual(toStr(-0), '0')
     })
 
     it('should convert NaN to empty string', function () {
-      assert.strictEqual(toString(NaN), '')
+      assert.strictEqual(toStr(NaN), '')
     })
 
     it('should convert Infinity to empty string', function () {
-      assert.strictEqual(toString(Infinity), '')
+      assert.strictEqual(toStr(Infinity), '')
     })
 
     it('should convert true to empty string', function () {
-      assert.strictEqual(toString(true), '')
+      assert.strictEqual(toStr(true), '')
     })
 
     it('should convert false to empty string', function () {
-      assert.strictEqual(toString(true), '')
+      assert.strictEqual(toStr(true), '')
     })
 
     it('should convert null to empty string', function () {
-      assert.strictEqual(toString(null), '')
+      assert.strictEqual(toStr(null), '')
     })
 
     it('should convert undefined to empty string', function () {
-      assert.strictEqual(toString(undefined), '') // eslint-disable-line no-undefined
+      assert.strictEqual(toStr(undefined), '') // eslint-disable-line no-undefined
     })
 
     it('should convert function to empty string', function () {
-      assert.strictEqual(toString(function () {}), '')
+      assert.strictEqual(toStr(function () {}), '')
     })
 
     it('should convert array to empty string', function () {
-      assert.strictEqual(toString([]), '')
+      assert.strictEqual(toStr([]), '')
     })
 
     it('should convert plain object to empty string', function () {
-      assert.strictEqual(toString({}), '')
+      assert.strictEqual(toStr({}), '')
     })
 
     it('should convert symbol to empty string', function () {
-      assert.strictEqual(toString(Symbol('test')), '')
+      assert.strictEqual(toStr(Symbol('test')), '')
     })
 
     it('should convert object to string using object’s custom toString() method', function () {
@@ -358,15 +358,15 @@ describe('2', function () {
         }
       }
       const object = new TestClass()
-      assert.strictEqual(toString(object), 'string value')
+      assert.strictEqual(toStr(object), 'string value')
     })
 
     it('should return `elseReturn` if input is unconvertible', function () {
-      assert.strictEqual(toString({}, {elseReturn: 'test'}), 'test')
+      assert.strictEqual(toStr({}, {elseReturn: 'test'}), 'test')
     })
 
     it('should throw `elseThrow` if input is unconvertible', function () {
-      assert.throws(() => { toString({}, {elseThrow: true}) }, TypeError)
+      assert.throws(() => { toStr({}, {elseThrow: true}) }, TypeError)
     })
   })
 

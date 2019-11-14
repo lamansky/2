@@ -1,10 +1,12 @@
 'use strict'
 
+const toArray = require('./array')
+const toIterator = require('./iterator')
+const toMap = require('./map')
+const toNumber = require('./number')
+const toObject = require('./object')
+const toStr = require('./string')
+
 module.exports = {
-  toArray: require('./array'),
-  toIterator: require('./iterator'),
-  toMap: require('./map'),
-  toNumber: require('./number'),
-  toObject: require('./object'),
-  toString: require('./string'),
+  toArray, toIterator, toMap, toNumber, toObject, toString: toStr, toStr,
 }

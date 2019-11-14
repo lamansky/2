@@ -11,7 +11,7 @@ const newObject = require('new-object')
 const otherwise = require('otherwise')
 const sbo = require('sbo')
 
-module.exports = sbo(function toObject (x, {arrays = [], elseReturn = {}, elseThrow, maps = [], mirror = false} = {}) {
+module.exports = sbo(function toObject (x, {arrays = [], elseCall, elseReturn = {}, elseThrow, maps = [], mirror = false} = {}) {
   if (isInstanceOf(x, [Map, maps])) return newObject(x.entries(), {throwIfEquivKeys: true})
   if (isIterable(x) && typeof x !== 'string') {
     if (every(x, el => isArrayOfLength(el, 2))) return newObject(x)
@@ -19,5 +19,5 @@ module.exports = sbo(function toObject (x, {arrays = [], elseReturn = {}, elseTh
     return newObject(addCounter(x))
   }
   if (isObject(x)) return x
-  return otherwise({elseReturn, elseThrow}, TypeError)
+  return otherwise({elseCall, elseReturn, elseThrow}, {defaultErrorClass: TypeError})
 })

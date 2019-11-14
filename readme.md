@@ -32,7 +32,9 @@ You can require needed functions via a destructuring assignment:
 const {toArray, toIterator, toMap, toNumber, toObject, toString} = require('2')
 ```
 
-Or you can require individual functions via submodules:
+(If your project has a linting rule that precludes shadowing the global `toString` function, you can also destructure the `toStr` function, which is the same as `toString`.)
+
+You can also require individual functions via submodules:
 
 ```javascript
 const toArray = require('2/array')
