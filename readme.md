@@ -16,7 +16,7 @@ data = toString(data) // '1.23'
 
 ## Installation
 
-Requires [Node.js](https://nodejs.org/) 7.0.0 or above.
+Requires [Node.js](https://nodejs.org/) 8.3.0 or above.
 
 ```bash
 npm i 2
@@ -131,6 +131,14 @@ toNumber(Infinity, {finite: false}) // Infinity
 let numberObject = new Number(123)
 typeof numberObject // 'object'
 typeof toNumber(numberObject) // 'number'
+
+// Can parse strings that have digit grouping:
+toNumber('1,234') // 1234
+// The built-in Number function, on the other hand, cannot:
+Number('1,234') // NaN
+
+// Can be configured to interpret the comma as a decimal point:
+toNumber('1,234', {decimalComma: true}) // 1.234
 ```
 
 ### Converting to Objects
@@ -211,10 +219,15 @@ typeof toString(stringObject) // 'string'
 
 Here are backward-incompatible changes you need to know about.
 
+### 2.x ⇒ 3.x
+
+* The minimum supported Node version is now 8.3.0 (instead of 7.0.0).
+* `toNumber` no lounger rounds the `elseReturn` value when `round` is `true`. If you need this behavior, apply `Math.round` to your `elseReturn` value manually.
+
 ### 1.x ⇒ 2.x
 
-* `fallback` has been renamed to `elseReturn`
-* Use `elseThrow: true` instead of `fallback: null`
+* `fallback` has been renamed to `elseReturn`.
+* Use `elseThrow: true` instead of `fallback: null`.
 * Unlike the old `fallback` parameter, `elseReturn` does _not_ type-enforce its values.
 * `toObject` with `mirror: true` will now throw an error if any key would overwrite another key. In version 1, this would have been allowed.
 * `toObject` with `mirror: true` will now allow an object to become an object key, so long as its string representation is not equivalent to that of any other key. In version 1, attempting to use an object as an object key would silently fail and would result in numeric index keys being used instead.

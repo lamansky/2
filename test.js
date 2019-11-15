@@ -205,6 +205,90 @@ describe('2', function () {
       assert.strictEqual(toNumber('1.2'), 1.2)
     })
 
+    it('should convert negative number string to number', function () {
+      assert.strictEqual(toNumber('-1.2'), -1.2)
+      assert.strictEqual(toNumber('−123'), -123)
+      assert.strictEqual(toNumber('−123K'), -123000)
+      assert.strictEqual(toNumber('0−123'), 0) // Invalid
+      assert.strictEqual(toNumber('(123.45)'), -123.45)
+      assert.strictEqual(toNumber('(-123.45)'), 0) // Invalid
+      assert.strictEqual(toNumber('123.45)'), 0) // Invalid
+      assert.strictEqual(toNumber('(123.45'), 0) // Invalid
+    })
+
+    it('should support digit grouping', function () {
+      assert.strictEqual(toNumber('1,000'), 1000)
+      assert.strictEqual(toNumber('1 000'), 1000)
+      assert.strictEqual(toNumber('1 000'), 1000)
+      assert.strictEqual(toNumber('1.000'), 1)
+      assert.strictEqual(toNumber('1.00'), 1)
+      assert.strictEqual(toNumber('1,234.56'), 1234.56)
+      assert.strictEqual(toNumber('12,34,567.89'), 1234567.89)
+    })
+
+    it('should support decimal comma syntax', function () {
+      assert.strictEqual(toNumber('1.000', {decimalComma: true}), 1000)
+      assert.strictEqual(toNumber('1,234'), 1234)
+      assert.strictEqual(toNumber('1,234', {decimalComma: true}), 1.234)
+    })
+
+    it('should return fallback (default 0) for invalid digit grouping', function () {
+      assert.strictEqual(toNumber('1 23'), 0)
+      assert.strictEqual(toNumber('1,234,56'), 0)
+      assert.strictEqual(toNumber('1,2,3'), 0)
+      assert.strictEqual(toNumber('1,234,56', {decimalComma: true}), 0)
+      assert.strictEqual(toNumber('1,234,56789'), 0)
+      assert.strictEqual(toNumber('1,234.567,890'), 0)
+      assert.strictEqual(toNumber('1,234 567 890'), 0)
+      assert.strictEqual(toNumber('1,2,34,567.89'), 0)
+      assert.strictEqual(toNumber('1,2,,34,567.89'), 0)
+      assert.strictEqual(toNumber('12,34,56.7'), 0)
+    })
+
+    it('should allow contrary punctuation if there’s no ambiguity', function () {
+      assert.strictEqual(toNumber('1,23'), 1.23)
+      assert.strictEqual(toNumber('1.234,56', {decimalComma: true}), 1234.56)
+      assert.strictEqual(toNumber('1.234,56'), 1234.56)
+      assert.strictEqual(toNumber('1234,56'), 1234.56)
+      assert.strictEqual(toNumber('1,23456'), 1.23456)
+      assert.strictEqual(toNumber('1,234.00', {decimalComma: true}), 1234)
+      assert.strictEqual(toNumber('1 234.00', {decimalComma: true}), 1234)
+      assert.strictEqual(toNumber('1 234.567,890'), 1234567.89)
+    })
+
+    it('should support `decimalPlacesInInt`', function () {
+      assert.strictEqual(toNumber('1,23', {decimalPlacesInInt: 2}), 123)
+      assert.strictEqual(toNumber('1.23', {decimalPlacesInInt: 2}), 123)
+      assert.strictEqual(toNumber('1.2345', {decimalPlacesInInt: 2}), 123)
+    })
+
+    it('should support k/g/m/b suffixes', function () {
+      assert.strictEqual(toNumber('1k'), 1000)
+      assert.strictEqual(toNumber('2K'), 2000)
+      assert.strictEqual(toNumber('3g'), 3000)
+      assert.strictEqual(toNumber('400G'), 400000)
+      assert.strictEqual(toNumber('5k0'), 0) // Invalid
+      assert.strictEqual(toNumber('5bk'), 0) // Invalid
+      assert.strictEqual(toNumber('6m'), 6000000)
+      assert.strictEqual(toNumber('7M'), 7000000)
+      assert.strictEqual(toNumber('8b'), 8000000000)
+      assert.strictEqual(toNumber('9B'), 9000000000)
+    })
+
+    it('should guess at bad input if `ignoreBadChars` is `true`', function () {
+      assert.strictEqual(toNumber('--1', {ignoreBadChars: true}), -1)
+      assert.strictEqual(toNumber('1,234,56789', {ignoreBadChars: true}), 1234.56789)
+      assert.strictEqual(toNumber('1,234,56789', {ignoreBadChars: true, decimalPlacesInInt: 2}), 123456)
+      assert.strictEqual(toNumber('1,2,,34,567.89', {ignoreBadChars: true}), 1234567.89)
+      assert.strictEqual(toNumber('1,000', {ignoreBadChars: true}), 1000)
+      assert.strictEqual(toNumber('5k0', {ignoreBadChars: true}), 50)
+      assert.strictEqual(toNumber('5bk', {ignoreBadChars: true}), 5000)
+      assert.strictEqual(toNumber('5)', {ignoreBadChars: true}), 5)
+      assert.strictEqual(toNumber('This is 1 number', {ignoreBadChars: true}), 1)
+      assert.strictEqual(toNumber('This is Infinity!', {finite: false, ignoreBadChars: true}), Infinity)
+      assert.strictEqual(toNumber('not a number', {ignoreBadChars: true, elseReturn: 100}), 100)
+    })
+
     it('should round float to integer if `round` is true', function () {
       assert.strictEqual(toNumber(4.7, {round: true}), 5)
     })
@@ -221,8 +305,28 @@ describe('2', function () {
       assert.strictEqual(toNumber(-Infinity, {finite: false}), -Infinity)
     })
 
+    it('should convert string representations of Infinity', function () {
+      assert.strictEqual(toNumber('Infinity', {finite: false}), Infinity)
+      assert.strictEqual(toNumber('infinity', {finite: false}), Infinity)
+
+      assert.strictEqual(toNumber('-Infinity', {finite: false}), -Infinity)
+      assert.strictEqual(toNumber('−Infinity', {finite: false}), -Infinity)
+      assert.strictEqual(toNumber('−infinity', {finite: false}), -Infinity)
+
+      assert.strictEqual(toNumber('Infinity'), 0)
+      assert.strictEqual(toNumber('--Infinity', {finite: false}), 0) // Invalid
+    })
+
     it('should return fallback (default 0) for NaN', function () {
       assert.strictEqual(toNumber(NaN), 0)
+    })
+
+    it('should return fallback (default 0) for null', function () {
+      assert.strictEqual(toNumber(null), 0)
+    })
+
+    it('should return fallback (default 0) for undefined', function () {
+      assert.strictEqual(toNumber(undefined), 0) // eslint-disable-line no-undefined
     })
 
     it('should return 0 if number is invalid and no fallback provided', function () {
@@ -233,8 +337,8 @@ describe('2', function () {
       assert.strictEqual(toNumber('not a number', {elseReturn: 2}), 2)
     })
 
-    it('should round `elseReturn` if `round` is true', function () {
-      assert.strictEqual(toNumber({}, {elseReturn: 3.3, round: true}), 3)
+    it('should not round `elseReturn` if `round` is true', function () {
+      assert.strictEqual(toNumber({}, {elseReturn: 3.3, round: true}), 3.3)
     })
 
     it('should throw `elseThrow` if input is unconvertible', function () {

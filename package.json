@@ -26,7 +26,7 @@
   "repository": "lamansky/2",
   "main": "index.js",
   "engines": {
-    "node": ">=7.0.0"
+    "node": ">=8.3.0"
   },
   "dependencies": {
     "@lamansky/every": "^1.0.0",
@@ -40,7 +40,8 @@
     "map-iter": "^1.0.0",
     "new-object": "^3.1.0",
     "otherwise": "^2.0.0",
-    "qfn": "^1.0.1",
+    "parser-factory": "^1.1.0",
+    "round-to": "^4.0.0",
     "sbo": "^1.1.0"
   },
   "devDependencies": {
