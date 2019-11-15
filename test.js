@@ -392,6 +392,23 @@ describe('2', function () {
     it('should throw error if Map has keys that are not strings/numbers', function () {
       assert.throws(() => { toObject(new Map([{}, 'test'])) }, TypeError)
     })
+
+    it('should accept property descriptor settings', function () {
+      const map = new Map([['a', 1], ['b', 2]])
+
+      {
+        const object = toObject(map, {descriptors: {}})
+        assert.strictEqual(Object.entries(object).length, 0)
+        assert.strictEqual(object.a, 1)
+        assert.strictEqual(object.b, 2)
+      }
+
+      {
+        const object = toObject(map, {descriptors: {enumerable: true}})
+        assert.strictEqual(Object.entries(object).length, 2)
+        assert.throws(() => { object.a = 3 })
+      }
+    })
   })
 
   describe('#toString()', function () {

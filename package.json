@@ -38,7 +38,7 @@
     "is-nil": "^1.0.1",
     "is-object": "^1.0.1",
     "map-iter": "^1.0.0",
-    "new-object": "^3.1.0",
+    "new-object": "^4.0.0",
     "otherwise": "^2.0.0",
     "parser-factory": "^1.1.0",
     "round-to": "^4.0.0",

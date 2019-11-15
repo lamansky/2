@@ -50,7 +50,7 @@ const toString = require('2/string')
 const toArray = require('2/array')
 
 // Map => Array
-let map = new Map()
+const map = new Map()
 map.set('a', 1)
 map.set('b', 2)
 toArray(map) // [['a', 1], ['b', 2]]
@@ -87,19 +87,19 @@ toIterator('test').next().value // 'test'
 const toMap = require('2/map')
 
 // Array of key/value pairs => Map
-toMap([['a', 1], ['b', 2]])
-map.get('a') // 1
-map.get('b') // 2
+const map1 = toMap([['a', 1], ['b', 2]])
+map1.get('a') // 1
+map1.get('b') // 2
 
 // Array of values => Map
-let map = toMap(['a', 'b'])
-map.get(0) // 'a'
-map.get(1) // 'b'
+const map2 = toMap(['a', 'b'])
+map2.get(0) // 'a'
+map2.get(1) // 'b'
 
 // Object => Map
-map = toMap({a: 1, b: 2})
-map.get('a') // 1
-map.get('b') // 2
+const map3 = toMap({a: 1, b: 2})
+map3.get('a') // 1
+map3.get('b') // 2
 ```
 
 ### Converting to Numbers
@@ -128,7 +128,7 @@ toNumber(Infinity) // 0
 toNumber(Infinity, {finite: false}) // Infinity
 
 // Number object => Number
-let numberObject = new Number(123)
+const numberObject = new Number(123)
 typeof numberObject // 'object'
 typeof toNumber(numberObject) // 'number'
 
@@ -146,30 +146,42 @@ toNumber('1,234', {decimalComma: true}) // 1.234
 const toObject = require('2/object')
 
 // Array of key/value pairs => Object
-let obj = toObject([['a', 1], ['b', 2]])
-obj.a // 1
-obj.b // 2
+const obj1 = toObject([['a', 1], ['b', 2]])
+obj1.a // 1
+obj1.b // 2
 
 // Array => Object
-let obj = toObject(['first', 'second'])
-Object.keys(obj).length // 2
-obj[0] // 'first'
-obj[1] // 'second'
+const obj2 = toObject(['first', 'second'])
+Object.keys(obj2).length // 2
+obj2[0] // 'first'
+obj2[1] // 'second'
 
 // In the above example, the array indices become the object keys.
 // But you can make the keys mirror the values instead:
-let obj = toObject(['first', 'second'], {mirror: true})
-Object.keys(obj).length // 2
-obj.first // 'first'
-obj.second // 'second'
+const obj3 = toObject(['first', 'second'], {mirror: true})
+Object.keys(obj3).length // 2
+obj3.first // 'first'
+obj3.second // 'second'
 
 // Map => Object
-let map = new Map()
+const map = new Map()
 map.set('key1', 'value1')
 map.set('key2', 'value2')
-let obj = toObject(map)
-obj.key1 // 'value1'
-obj.key2 // 'value2'
+const obj4 = toObject(map)
+obj4.key1 // 'value1'
+obj4.key2 // 'value2'
+
+// Duplicate keys
+toObject([['key', 1], ['key', 2]]) // throws an error (default behavior)
+const obj5 = toObject([['key', 1], ['key', 2]], {throwIfEquivKeys: false}) // error-throwing disabled
+Object.keys(obj5).length // 1
+obj5.key // 2
+
+// Setting property descriptors
+const obj6 = toObject([['a', 1], ['b', 2]], {descriptors: {enumerable: false}})
+Object.keys(obj6).length // 0 (because the properties are non-enumerable)
+obj6.a // 1
+obj6.b // 2
 ```
 
 ### Converting to Strings
@@ -210,7 +222,7 @@ toString(undefined, {elseReturn: 'N/A'}) // 'N/A'
 toString(undefined, {elseThrow: true}) // throws error
 
 // String object => String
-let stringObject = new String('test')
+const stringObject = new String('test')
 typeof stringObject // 'object'
 typeof toString(stringObject) // 'string'
 ```
@@ -223,6 +235,7 @@ Here are backward-incompatible changes you need to know about.
 
 * The minimum supported Node version is now 8.3.0 (instead of 7.0.0).
 * `toNumber` no lounger rounds the `elseReturn` value when `round` is `true`. If you need this behavior, apply `Math.round` to your `elseReturn` value manually.
+* `toObject` will now throw an error if an entries array contains duplicate keys. In version 2, the last equivalent key would have silently overwritten the prior ones. You can restore the previous behavior by setting the new `throwIfEquivKeys` option to `false`.
 
 ### 1.x ⇒ 2.x
 
